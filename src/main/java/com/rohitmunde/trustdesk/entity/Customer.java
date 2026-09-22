@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,11 +26,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "customers")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "customer_id")
-    private Long id;
+    @Column(name = "customer_id", length = 50)
+    private String id;
 
     @Column(nullable = false)
     private String name;
@@ -50,6 +51,11 @@ public class Customer {
     @Column
     private Boolean verified;
 
-    @Column
-    private List<String> tags;
+    @ElementCollection
+    @CollectionTable(
+            name = "customer_tags",
+            joinColumns = @JoinColumn(name = "customer_id")
+    )
+    @Column(name = "tag", nullable = false)
+    private List<String> tags = new ArrayList<>();
 }

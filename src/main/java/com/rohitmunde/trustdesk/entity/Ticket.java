@@ -30,11 +30,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "tickets")
 public class Ticket {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ticket_id")
-    private Long id;
+    @Column(name = "ticket_id", length = 50)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -62,24 +62,24 @@ public class Ticket {
     @Column(nullable = false)
     private TicketStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "expected_category", nullable = false)
-    private TicketCategory expectedCategory;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "expected_priority", nullable = false)
-    private TicketPriority expectedPriority;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "expected_sentiment", nullable = false)
-    private TicketSentiment expectedSentiment;
-
-    @Column(name = "expected_escalation", nullable = false)
-    private Boolean expectedEscalation;
-
-    @ElementCollection
-    @Column(name = "expected_actions")
-    private List<String> expectedActions;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "expected_category", nullable = false)
+//    private TicketCategory expectedCategory;
+//
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "expected_priority", nullable = false)
+//    private TicketPriority expectedPriority;
+//
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "expected_sentiment", nullable = false)
+//    private TicketSentiment expectedSentiment;
+//
+//    @Column(name = "expected_escalation", nullable = false)
+//    private Boolean expectedEscalation;
+//
+//    @ElementCollection
+//    @Column(name = "expected_actions")
+//    private List<String> expectedActions;
 
     @Column(name = "triaged_at")
     private OffsetDateTime triagedAt;

@@ -1,4 +1,4 @@
-package com.TrustDesk;
+package com.rohitmunde.trustdesk;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

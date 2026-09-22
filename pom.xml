@@ -8,8 +8,8 @@
 		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com</groupId>
-	<artifactId>TrustDesk</artifactId>
+	<groupId>com.rohitmunde</groupId>
+	<artifactId>trustdesk</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

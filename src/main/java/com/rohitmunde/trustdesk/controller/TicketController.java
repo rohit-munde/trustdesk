@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/tickets")
@@ -20,5 +22,11 @@ public class TicketController {
     public ApiSuccessResponse<TicketDetailsDto> getTicketById(@PathVariable String id) {
         TicketDetailsDto ticketDetailsDto = ticketService.getTicketById(id);
         return new ApiSuccessResponse<>(MessageConstants.TICKET_FETCH_SUCCESS, ticketDetailsDto);
+    }
+
+    @GetMapping
+    public ApiSuccessResponse<List<TicketDetailsDto>> getAllTickets() {
+        List<TicketDetailsDto> tickets = ticketService.getAllTickets();
+        return new ApiSuccessResponse<>(MessageConstants.TICKET_FETCH_SUCCESS, tickets);
     }
 }

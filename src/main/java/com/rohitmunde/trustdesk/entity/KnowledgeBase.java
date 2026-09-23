@@ -1,4 +1,4 @@
 package com.rohitmunde.trustdesk.entity;
 
-public class KnowledgePolicy {
+public class KnowledgeBase {
 }

@@ -1,24 +1,24 @@
 package com.rohitmunde.trustdesk.service;
 
 import com.rohitmunde.trustdesk.TicketRepository;
+import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
-import lombok.AllArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +29,9 @@ public class TicketTriageServiceTest {
 
     @Mock
     private KnowledgeBaseService knowledgeBaseService;
+
+    @Mock
+    private AiClient aiClient;
 
     @InjectMocks
     private TicketTriageService ticketTriageService;
@@ -59,7 +62,7 @@ public class TicketTriageServiceTest {
         when(knowledgeBaseService.searchRelevantPolicies(ticket.getSubject() + " " + ticket.getBody(), 3))
                 .thenReturn(List.of(policy));
 
-        when(ticketTriageService.triageTicket(ticket.getId())).thenReurn(triageResult);
+        when(aiClient.triage(any())).thenReturn(triageResult);
 
         TriageResult triagedResult = ticketTriageService.triageTicket(ticket.getId());
 

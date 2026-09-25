@@ -22,7 +22,6 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@AllArgsConstructor
 public class TicketTriageServiceTest {
 
     @Mock
@@ -32,7 +31,7 @@ public class TicketTriageServiceTest {
     private KnowledgeBaseService knowledgeBaseService;
 
     @InjectMocks
-    private final TicketTriageService ticketTriageService;
+    private TicketTriageService ticketTriageService;
 
     @Test
     void shouldTriageAndUpdateTicket() {
@@ -60,7 +59,7 @@ public class TicketTriageServiceTest {
         when(knowledgeBaseService.searchRelevantPolicies(ticket.getSubject() + " " + ticket.getBody(), 3))
                 .thenReturn(List.of(policy));
 
-        when(ticketTriageService.triageTicket(ticket.getId())).thenReturn(triageResult);
+        when(ticketTriageService.triageTicket(ticket.getId())).thenReurn(triageResult);
 
         TriageResult triagedResult = ticketTriageService.triageTicket(ticket.getId());
 

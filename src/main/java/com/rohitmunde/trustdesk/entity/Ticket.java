@@ -46,4 +46,23 @@ public class Ticket {
 
     @Column(name = "triaged_at")
     private OffsetDateTime triagedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TicketCategory ticketCategory;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TicketPriority ticketPriority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TicketChannel ticketChannel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TicketSentiment ticketSentiment;
+
+    @Column
+    private Boolean escalationRequired;
 }

@@ -4,6 +4,7 @@ import com.rohitmunde.trustdesk.TicketRepository;
 import com.rohitmunde.trustdesk.constants.MessageConstants;
 import com.rohitmunde.trustdesk.dto.TicketDetailsDto;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.TicketStatus;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.service.interfaces.ITicketService;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,22 @@ public class TicketService implements ITicketService {
                         .createdAt(ticket.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TicketDetailsDto updateTicketPriority(String id, TicketStatus ticketPriority) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new TicketNotFoundException(String.format(MessageConstants.TICKET_NOT_FOUND, id)));
+
+        ticket.setStatus(ticketPriority);
+        ticketRepository.save(ticket);
+        return TicketDetailsDto.builder()
+                .ticketId(ticket.getId())
+                .channel(ticket.getChannel())
+                .subject(ticket.getSubject())
+                .body(ticket.getBody())
+                .status(ticket.getStatus())
+                .createdAt(ticket.getCreatedAt())
+                .build();
     }
 }

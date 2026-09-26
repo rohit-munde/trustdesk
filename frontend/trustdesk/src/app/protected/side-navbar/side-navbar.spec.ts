@@ -28,4 +28,13 @@ describe('SideNavbar', () => {
     expect(compiled.textContent).toContain('Tickets');
     expect(compiled.textContent).toContain('Evaluations');
   });
+
+  it('should use Angular Material sidenav and nav list components', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('mat-sidenav-container')).toBeTruthy();
+    expect(compiled.querySelector('mat-sidenav')).toBeTruthy();
+    expect(compiled.querySelector('mat-nav-list')).toBeTruthy();
+    expect(compiled.querySelectorAll('a[mat-list-item]').length).toBe(2);
+  });
 });

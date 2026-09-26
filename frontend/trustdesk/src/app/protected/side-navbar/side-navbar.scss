@@ -4,13 +4,19 @@
   min-height: 100vh;
 }
 
-.side-navbar {
+.side-navbar-container {
   width: 240px;
   min-height: 100vh;
+  background: transparent;
+}
+
+.side-navbar {
+  width: 240px;
   padding: 32px 18px;
   background: linear-gradient(180deg, #f8fbff 0%, #f3f7fd 100%);
   border-right: 1px solid #dfe7f1;
   box-sizing: border-box;
+  box-shadow: none;
 }
 
 .brand {
@@ -35,19 +41,19 @@
 .nav-links {
   display: grid;
   gap: 10px;
+  padding: 0;
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 54px;
+  height: 54px;
   padding: 0 16px;
   color: #64748b;
   border-radius: 8px;
-  text-decoration: none;
   font-size: 19px;
   font-weight: 500;
+  --mdc-list-list-item-one-line-container-height: 54px;
+  --mdc-list-list-item-leading-icon-start-space: 0;
+  --mdc-list-list-item-leading-icon-end-space: 16px;
   transition:
     background-color 150ms ease,
     color 150ms ease,
@@ -71,14 +77,13 @@
 }
 
 .nav-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 26px;
   height: 26px;
   color: #64748b;
   font-size: 25px;
   border-radius: 6px;
+  line-height: 26px;
+  text-align: center;
 }
 
 @media (max-width: 760px) {
@@ -87,9 +92,13 @@
     min-height: auto;
   }
 
+  .side-navbar-container,
   .side-navbar {
     width: 100%;
     min-height: auto;
+  }
+
+  .side-navbar {
     padding: 20px 16px;
     border-right: none;
     border-bottom: 1px solid #dfe7f1;
@@ -108,8 +117,13 @@
   }
 
   .nav-link {
-    min-height: 48px;
+    height: 48px;
     font-size: 16px;
-    gap: 10px;
+    --mdc-list-list-item-one-line-container-height: 48px;
+    --mdc-list-list-item-leading-icon-end-space: 10px;
+  }
+
+  .nav-icon {
+    font-size: 22px;
   }
 }

@@ -1,0 +1,55 @@
+// Colors
+$primary-color: #2563eb;
+$primary-hover: #1d4ed8;
+$text-dark: #0f172a;
+$text-medium: #475569;
+$text-light: #94a3b8;
+$border-color: #e2e8f0;
+$bg-slate: #f8fafc;
+
+:host {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background-color: $bg-slate;
+  overflow-x: hidden;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+// ----------------------------------------------------
+// Navbar Header Styling
+// ----------------------------------------------------
+.signout-btn {
+  background-color: transparent;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  height: 38px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-medium;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  span {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background-color: #f1f5f9;
+    color: $text-dark;
+    border-color: #cbd5e1;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}

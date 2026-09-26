@@ -61,10 +61,17 @@ public class TicketService implements ITicketService {
     private TicketDetailsDto toDetailsDto(Ticket ticket) {
         return TicketDetailsDto.builder()
                 .ticketId(ticket.getId())
+                .customerId(ticket.getCustomer().getId())
+                .orderId(ticket.getOrder().getId())
                 .channel(ticket.getChannel())
                 .subject(ticket.getSubject())
                 .body(ticket.getBody())
                 .status(ticket.getStatus())
+                .priority(ticket.getTicketPriority())
+                .category(ticket.getTicketCategory())
+                .sentiment(ticket.getTicketSentiment())
+                .escalationRequired(ticket.getEscalationRequired())
+                .triagedAt(ticket.getTriagedAt())
                 .createdAt(ticket.getCreatedAt())
                 .build();
     }

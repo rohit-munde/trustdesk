@@ -1,6 +1,9 @@
 package com.rohitmunde.trustdesk.dto;
 
 import com.rohitmunde.trustdesk.enums.TicketChannel;
+import com.rohitmunde.trustdesk.enums.TicketCategory;
+import com.rohitmunde.trustdesk.enums.TicketPriority;
+import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.enums.TicketStatus;
 import lombok.*;
 
@@ -29,9 +32,16 @@ import java.time.OffsetDateTime;
 @Builder
 public class TicketDetailsDto {
     private String ticketId;
+    private String customerId;
+    private String orderId;
     private TicketChannel channel;
     private String subject;
     private String body;
     private OffsetDateTime createdAt;
     private TicketStatus status;
+    private TicketPriority priority;
+    private TicketCategory category;
+    private TicketSentiment sentiment;
+    private Boolean escalationRequired;
+    private OffsetDateTime triagedAt;
 }

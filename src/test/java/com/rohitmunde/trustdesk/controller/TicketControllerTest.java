@@ -60,7 +60,14 @@ class TicketControllerTest {
 
         mockMvc.perform(get("/tickets/tkt_9001"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.payload.ticketId").value("tkt_9001"));
+                .andExpect(jsonPath("$.payload.ticketId").value("tkt_9001"))
+                .andExpect(jsonPath("$.payload.customerId").value("cus_1001"))
+                .andExpect(jsonPath("$.payload.orderId").value("ord_5001"))
+                .andExpect(jsonPath("$.payload.priority").value("LOW"))
+                .andExpect(jsonPath("$.payload.category").value("GENERAL"))
+                .andExpect(jsonPath("$.payload.sentiment").value("NEUTRAL"))
+                .andExpect(jsonPath("$.payload.escalationRequired").value(false))
+                .andExpect(jsonPath("$.payload.triagedAt").value("2026-06-28T11:15:00+05:30"));
     }
 
     @Test
@@ -130,6 +137,13 @@ class TicketControllerTest {
                 .body("The left earbud arrived cracked.")
                 .createdAt(OffsetDateTime.parse("2026-06-28T10:15:00+05:30"))
                 .status(TicketStatus.OPEN)
+                .customerId("cus_1001")
+                .orderId("ord_5001")
+                .priority(TicketPriority.LOW)
+                .category(TicketCategory.GENERAL)
+                .sentiment(TicketSentiment.NEUTRAL)
+                .escalationRequired(false)
+                .triagedAt(OffsetDateTime.parse("2026-06-28T11:15:00+05:30"))
                 .build();
     }
 }

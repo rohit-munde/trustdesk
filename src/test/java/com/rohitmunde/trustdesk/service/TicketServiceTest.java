@@ -1,9 +1,13 @@
 package com.rohitmunde.trustdesk.service;
 
 import com.rohitmunde.trustdesk.TicketRepository;
+import com.rohitmunde.trustdesk.entity.Customer;
+import com.rohitmunde.trustdesk.entity.Order;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
+import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.enums.TicketStatus;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -43,6 +47,28 @@ class TicketServiceTest {
     }
 
     @Test
+    void mapsTicketContextAndTriageFields() {
+        Ticket ticket = ticket("tkt_9001");
+        OffsetDateTime triagedAt = OffsetDateTime.parse("2026-06-28T11:15:00+05:30");
+        ticket.setTicketPriority(TicketPriority.HIGH);
+        ticket.setTicketCategory(TicketCategory.REFUND);
+        ticket.setTicketSentiment(TicketSentiment.FRUSTRATED);
+        ticket.setEscalationRequired(true);
+        ticket.setTriagedAt(triagedAt);
+        when(ticketRepository.findById("tkt_9001")).thenReturn(Optional.of(ticket));
+
+        var response = ticketService.getTicketById("tkt_9001");
+
+        assertThat(response.getCustomerId()).isEqualTo("cus_1001");
+        assertThat(response.getOrderId()).isEqualTo("ord_5001");
+        assertThat(response.getPriority()).isEqualTo(TicketPriority.HIGH);
+        assertThat(response.getCategory()).isEqualTo(TicketCategory.REFUND);
+        assertThat(response.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
+        assertThat(response.getEscalationRequired()).isTrue();
+        assertThat(response.getTriagedAt()).isEqualTo(triagedAt);
+    }
+
+    @Test
     void updatesStatusWithoutChangingPriority() {
         Ticket ticket = ticket("tkt_9001");
         ticket.setTicketPriority(TicketPriority.LOW);
@@ -78,13 +104,22 @@ class TicketServiceTest {
     }
 
     private Ticket ticket(String id) {
+        Customer customer = new Customer();
+        customer.setId("cus_1001");
+
+        Order order = new Order();
+        order.setId("ord_5001");
+
         Ticket ticket = new Ticket();
         ticket.setId(id);
+        ticket.setCustomer(customer);
+        ticket.setOrder(order);
         ticket.setChannel(TicketChannel.EMAIL);
         ticket.setSubject("Received damaged earbuds");
         ticket.setBody("The left earbud arrived cracked.");
         ticket.setCreatedAt(OffsetDateTime.parse("2026-06-28T10:15:00+05:30"));
         ticket.setStatus(TicketStatus.OPEN);
+        ticket.setTicketPriority(TicketPriority.LOW);
         return ticket;
     }
 }

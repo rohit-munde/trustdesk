@@ -1,10 +1,46 @@
 package com.rohitmunde.trustdesk.ai;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import com.rohitmunde.trustdesk.dto.TriageContext;
+import com.rohitmunde.trustdesk.enums.TicketCategory;
+import com.rohitmunde.trustdesk.enums.TicketPriority;
+import com.rohitmunde.trustdesk.enums.TicketSentiment;
+import com.rohitmunde.trustdesk.model.KnowledgeDocument;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@SpringBootTest
 public class MockAiClientTest {
 
     private final MockAiClient mockAiClient = new MockAiClient();
 
+    @Test
+    void triagesDamagedTicketAsRefund() {
+        var result = mockAiClient.triage(TriageContext.builder()
+                .subject("Received damaged earbuds")
+                .body("The left earbud arrived cracked.")
+                .policies(java.util.List.of(policy("refund_policy.md")))
+                .build());
+
+        Assertions.assertThat(result.getCategory()).isEqualTo(TicketCategory.REFUND);
+        Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.MEDIUM);
+        Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
+        Assertions.assertThat(result.getCitations()).containsExactly("refund_policy.md");
+    }
+
+    @Test
+    void triagesGeneralTicketAsLowPriority() {
+        var result = mockAiClient.triage(TriageContext.builder()
+                .subject("Question about account")
+                .body("I want to know where to update my phone number.")
+                .policies(java.util.List.of(policy("account_security_policy.md")))
+                .build());
+
+        Assertions.assertThat(result.getCategory()).isEqualTo(TicketCategory.GENERAL);
+        Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.LOW);
+        Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.NEUTRAL);
+        Assertions.assertThat(result.getCitations()).containsExactly("account_security_policy.md");
+    }
+
+    private KnowledgeDocument policy(String sourceFile) {
+        return new KnowledgeDocument("policy", "Policy", "Policy content", sourceFile);
+    }
 }

@@ -1,4 +1,4 @@
-package com.rohitmunde.trustdesk.congfig;
+package com.rohitmunde.trustdesk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +11,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-       http
-               .csrf(csrf -> csrf.disable())
-               .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-               .httpBasic(Customizer.withDefaults());
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 }

@@ -5,29 +5,27 @@ import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageContext;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TicketTriageService {
 
-    @Autowired
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
+    private final KnowledgeBaseService knowledgeBaseService;
+    private final AiClient aiClient;
 
-    @Autowired
-    private KnowledgeBaseService knowledgeBaseService;
-
-    @Autowired
-    private AiClient aiClient;
-
+    @Transactional
     public TriageResult triageTicket(String ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException(String.format("Ticket not found with id: %s", ticketId)));
+                .orElseThrow(() -> new TicketNotFoundException(String.format("Ticket not found with id: %s", ticketId)));
 
         String text = ticket.getSubject() + " " + ticket.getBody();
 

@@ -7,6 +7,7 @@ import com.rohitmunde.trustdesk.entity.Ticket;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
+import com.rohitmunde.trustdesk.exception.ResourceNotFoundException;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,16 @@ public class TicketTriageServiceTest {
         Assertions.assertThat(ticket.getTicketPriority()).isEqualTo(TicketPriority.MEDIUM);
         Assertions.assertThat(ticket.getTicketSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         Assertions.assertThat(ticket.getEscalationRequired()).isFalse();
+        Assertions.assertThat(ticket.getTriagedAt()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenTicketDoesNotExist() {
+        when(ticketRepository.findById("missing")).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> ticketTriageService.triageTicket("missing"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Ticket not found with id: missing");
     }
 
 }

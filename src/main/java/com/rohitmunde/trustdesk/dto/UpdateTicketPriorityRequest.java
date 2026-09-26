@@ -1,6 +1,6 @@
 package com.rohitmunde.trustdesk.dto;
 
-import com.rohitmunde.trustdesk.enums.TicketStatus;
+import com.rohitmunde.trustdesk.enums.TicketPriority;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateTicketStatusRequest {
+public class UpdateTicketPriorityRequest {
 
-    @NotNull(message = "Status is required")
-    private TicketStatus status;
+    @NotNull(message = "Priority is required")
+    private TicketPriority priority;
 }

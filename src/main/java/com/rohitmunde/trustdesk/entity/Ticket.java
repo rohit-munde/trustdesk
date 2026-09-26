@@ -57,10 +57,6 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TicketChannel ticketChannel;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TicketSentiment ticketSentiment;
 
     @Column

@@ -13,7 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tools.jackson.databind.exc.InvalidFormatException;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,22 +33,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
-    HashMap<String, String > validationErrors = new HashMap<>();
+        HashMap<String, String> validationErrors = new HashMap<>();
 
-    ex.getBindingResult().getFieldErrors().forEach(error ->
-            validationErrors.put(error.getField(), error.getDefaultMessage())
-    );
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                validationErrors.put(error.getField(), error.getDefaultMessage())
+        );
 
-    ApiErrorResponse apiError = new ApiErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation failed",
-            "Validation failed for one or more fields",
-            request.getRequestURI(),
-            validationErrors
-    );
+        ApiErrorResponse apiError = new ApiErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation failed",
+                "Validation failed for one or more fields",
+                request.getRequestURI(),
+                validationErrors
+        );
 
-    return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
-}
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
 
     // Handle Disabled/Deactivated Accounts during login (403 Forbidden)
     @ExceptionHandler(DisabledException.class)
@@ -74,7 +73,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
     }
 
-    // Generic Exception Handler in case unhandled exception comes and should not fuck up our server
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
         logger.error("An unexpected error occurred", ex);

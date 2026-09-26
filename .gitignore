@@ -30,5 +30,12 @@ build/
 !**/src/test/**/build/
 logs/
 
+### Local environment ###
+.env
+.env.*
+!.env.example
+application-local.properties
+application-*.local.properties
+
 ### VS Code ###
 .vscode/

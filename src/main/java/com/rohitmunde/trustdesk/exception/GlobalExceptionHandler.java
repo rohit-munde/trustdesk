@@ -4,11 +4,13 @@ import com.rohitmunde.trustdesk.response.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -120,5 +122,28 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    //To handle unsupported method
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiErrorResponse> handlerMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request){
+        String supportedMethods = ex.getSupportedHttpMethods() == null
+                ? "unknown"
+                : ex.getSupportedHttpMethods().stream()
+                .map(HttpMethod::name)
+                .collect(Collectors.joining(", "));
+
+        String message = String.format(
+                "The %s method is not supported for this endpoint. Supported methods are: %s",
+                ex.getMethod(),
+                supportedMethods
+        );
+        ApiErrorResponse apiError = new ApiErrorResponse(
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),
+                message,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.METHOD_NOT_ALLOWED);
     }
 }

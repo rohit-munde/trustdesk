@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MockAiClient implements AiClient{
+public class MockAiClient implements AiClient {
 
     @Override
     public TriageResult triage(TriageContext context) {
@@ -28,7 +28,7 @@ public class MockAiClient implements AiClient{
                     .sentiment(TicketSentiment.FRUSTRATED)
                     .escalationRequired(false)
                     .citations(citations)
-                    .draftReply("Hi, I’m sorry to hear about the issue. Based on our support policies, we can help review this and guide you through the next step.")
+                    .draftReply(buildDraftReply(TicketCategory.REFUND))
                     .build();
         }
 
@@ -38,7 +38,18 @@ public class MockAiClient implements AiClient{
                 .sentiment(TicketSentiment.NEUTRAL)
                 .escalationRequired(false)
                 .citations(citations)
-                .draftReply("Thank you for your patience. We're looking into this for you.")
+                .draftReply(buildDraftReply(TicketCategory.GENERAL))
                 .build();
+    }
+
+    private String buildDraftReply(TicketCategory category) {
+        return switch (category) {
+            case REFUND -> "I'm sorry your item arrived damaged. Based on our refund and replacement policy, we can help review this for a refund or replacement.";
+            case BILLING -> "Thanks for reaching out. We'll review the billing details and help resolve any incorrect charge.";
+            case SHIPPING -> "Thanks for contacting us. We'll check the shipping status and tracking details for your order.";
+            case WARRANTY -> "Thanks for reaching out. We'll review the product warranty details and help confirm the next available support option.";
+            case ACCOUNT_SECURITY -> "Thanks for reporting this. We'll review the account security concern and help protect your account.";
+            case GENERAL -> "Thank you for your patience. We're looking into this for you.";
+        };
     }
 }

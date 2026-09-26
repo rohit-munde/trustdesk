@@ -96,7 +96,8 @@ public class KnowledgeBaseService implements IKnowledgeBaseService {
 
         List<String> keywords = extractKeywords(ticketText);
         return documents.stream()
-                .filter(doc -> calculateScore(doc, keywords) > 0)
+                .filter(this::isCustomerSafePolicy)
+                .filter(document -> calculateScore(document, keywords) > 0)
                 .sorted((doc1, doc2) -> Integer.compare(calculateScore(doc2, keywords), calculateScore(doc1, keywords)))
                 .limit(limit)
                 .toList();
@@ -132,5 +133,10 @@ public class KnowledgeBaseService implements IKnowledgeBaseService {
         }
 
         return score;
+    }
+
+    private boolean isCustomerSafePolicy(KnowledgeDocument document) {
+        return document.getSourceFile() != null
+                && !document.getSourceFile().toLowerCase().contains("adversarial");
     }
 }

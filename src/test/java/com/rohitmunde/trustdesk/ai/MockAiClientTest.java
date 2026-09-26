@@ -24,7 +24,7 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.MEDIUM);
         Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         Assertions.assertThat(result.getCitations()).containsExactly("refund_policy.md");
-        Assertions.assertThat(result.getDraftReply()).isEqualTo("Hi, I’m sorry to hear about the issue. Based on our support policies, we can help review this and guide you through the next step.");
+        Assertions.assertThat(result.getDraftReply()).isEqualTo("I'm sorry your item arrived damaged. Based on our refund and replacement policy, we can help review this for a refund or replacement.");
     }
 
     @Test

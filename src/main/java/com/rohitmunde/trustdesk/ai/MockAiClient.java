@@ -28,6 +28,7 @@ public class MockAiClient implements AiClient{
                     .sentiment(TicketSentiment.FRUSTRATED)
                     .escalationRequired(false)
                     .citations(citations)
+                    .draftReply("Hi, I’m sorry to hear about the issue. Based on our support policies, we can help review this and guide you through the next step.")
                     .build();
         }
 
@@ -37,6 +38,7 @@ public class MockAiClient implements AiClient{
                 .sentiment(TicketSentiment.NEUTRAL)
                 .escalationRequired(false)
                 .citations(citations)
+                .draftReply("Thank you for your patience. We're looking into this for you.")
                 .build();
     }
 }

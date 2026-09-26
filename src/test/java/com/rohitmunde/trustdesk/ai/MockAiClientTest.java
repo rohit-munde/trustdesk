@@ -24,6 +24,7 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.MEDIUM);
         Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         Assertions.assertThat(result.getCitations()).containsExactly("refund_policy.md");
+        Assertions.assertThat(result.getDraftReply()).isEqualTo("Hi, I’m sorry to hear about the issue. Based on our support policies, we can help review this and guide you through the next step.");
     }
 
     @Test
@@ -38,6 +39,7 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.LOW);
         Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.NEUTRAL);
         Assertions.assertThat(result.getCitations()).containsExactly("account_security_policy.md");
+        Assertions.assertThat(result.getDraftReply()).isEqualTo("Thank you for your patience. We're looking into this for you.");
     }
 
     private KnowledgeDocument policy(String sourceFile) {

@@ -20,4 +20,5 @@ public class TriageResult {
     private TicketSentiment sentiment;
     private Boolean escalationRequired;
     private List<String> citations;
+    private String draftReply;
 }

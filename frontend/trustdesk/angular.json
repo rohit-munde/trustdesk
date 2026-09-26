@@ -72,7 +72,8 @@
               "buildTarget": "trustdesk:build:production"
             },
             "development": {
-              "buildTarget": "trustdesk:build:development"
+              "buildTarget": "trustdesk:build:development",
+              "proxyConfig": "proxy.config.json"
             }
           },
           "defaultConfiguration": "development"

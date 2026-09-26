@@ -1,34 +1,167 @@
 <section class="tickets-page">
+
+  <!-- Page header -->
   <header class="tickets-header">
     <h1>Support Tickets</h1>
+    <span class="ticket-count">{{ tickets().length }} tickets</span>
   </header>
 
-  <div class="tickets-panel">
-    <article class="ticket-row">
-      <span class="status-dot urgent"></span>
-      <div class="ticket-copy">
-        <h2>Delayed delivery</h2>
-        <p>Where is my order? It's been ...</p>
-      </div>
-      <time>Apr 24</time>
-    </article>
+  <!-- Two-panel layout -->
+  <div class="tickets-layout">
 
-    <article class="ticket-row selected">
-      <span class="status-dot warning"></span>
-      <div class="ticket-copy">
-        <h2>Refund request</h2>
-        <p>My headphones arrived dama...</p>
-      </div>
-      <time>Apr 23</time>
-    </article>
+    <!-- LEFT PANEL — ticket list -->
+    <div class="tickets-list-panel">
+      <div class="tickets-list">
+        @for (ticket of tickets(); track ticket.id) {
+          <article
+            class="ticket-row"
+            [ngClass]="{ selected: ticket.id === selectedId() }"
+            (click)="select(ticket)"
+            (keydown.enter)="select(ticket)"
+            tabindex="0"
+            [attr.aria-label]="'View ticket: ' + ticket.subject"
+            [attr.aria-pressed]="ticket.id === selectedId()"
+          >
+            <span class="status-dot" [ngClass]="priorityDotClass(ticket.priority)"></span>
 
-    <article class="ticket-row">
-      <span class="status-dot neutral"></span>
-      <div class="ticket-copy">
-        <h2>Account access</h2>
-        <p>I can't log in to my account.</p>
+            <div class="ticket-copy">
+              <h2>{{ ticket.subject }}</h2>
+              <p>{{ ticket.body }}</p>
+            </div>
+
+            <time [dateTime]="ticket.createdAt">
+              {{ ticket.createdAt | date : 'MMM d' }}
+            </time>
+          </article>
+        }
       </div>
-      <time>Apr 22</time>
-    </article>
+    </div>
+
+    <!-- RIGHT PANEL — ticket detail -->
+    <div class="ticket-detail-panel" [ngClass]="{ 'detail-visible': selectedTicket() !== null }">
+      @if (selectedTicket(); as ticket) {
+        <div class="detail-scroll">
+
+          <!-- Detail header -->
+          <div class="detail-header">
+            <div class="detail-title-row">
+              <h2 class="detail-title">{{ ticket.subject }}</h2>
+              <span class="status-badge" [ngClass]="statusClass(ticket.status)">
+                {{ statusLabel(ticket.status) }}
+              </span>
+            </div>
+            <p class="detail-id">{{ ticket.id }}</p>
+          </div>
+
+          <!-- Customer -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">person</span>
+              Customer
+            </h3>
+            <div class="info-card">
+              <div class="info-row">
+                <span class="info-label">Name</span>
+                <span class="info-value">{{ ticket.customerName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value email-value">{{ ticket.customerEmail }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Original message -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">mail</span>
+              Message
+            </h3>
+            <div class="message-card">
+              <p>{{ ticket.body }}</p>
+            </div>
+          </div>
+
+          <!-- AI Triage -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">psychology</span>
+              AI Triage
+            </h3>
+            <div class="triage-grid">
+              <div class="triage-chip">
+                <span class="chip-label">Category</span>
+                <span class="chip-value">{{ categoryLabel(ticket.category) }}</span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Priority</span>
+                <span class="chip-value priority-chip" [ngClass]="'priority-' + ticket.priority.toLowerCase()">
+                  {{ ticket.priority }}
+                </span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Sentiment</span>
+                <span class="chip-value sentiment-chip" [ngClass]="sentimentClass(ticket.sentiment)">
+                  <span class="material-symbols-outlined sentiment-icon">{{ sentimentIcon(ticket.sentiment) }}</span>
+                  {{ ticket.sentiment }}
+                </span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Escalation</span>
+                <span class="chip-value escalation-chip" [ngClass]="ticket.escalationRequired ? 'escalate-yes' : 'escalate-no'">
+                  <span class="material-symbols-outlined">{{ ticket.escalationRequired ? 'warning' : 'check_circle' }}</span>
+                  {{ ticket.escalationRequired ? 'Required' : 'Not required' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Draft reply -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">edit_note</span>
+              Draft Reply
+            </h3>
+            <div class="draft-card">
+              <p>{{ ticket.draftReply }}</p>
+              <button
+                class="copy-btn"
+                (click)="copyReply(ticket.draftReply)"
+                [attr.aria-label]="copiedReply ? 'Copied!' : 'Copy draft reply'"
+              >
+                <span class="material-symbols-outlined">{{ copiedReply ? 'check' : 'content_copy' }}</span>
+                {{ copiedReply ? 'Copied!' : 'Copy' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Citations -->
+          @if (ticket.citations.length > 0) {
+            <div class="detail-section">
+              <h3 class="section-title">
+                <span class="material-symbols-outlined section-icon">bookmark</span>
+                Policy Citations
+              </h3>
+              <div class="citations-list">
+                @for (citation of ticket.citations; track citation) {
+                  <span class="citation-tag">
+                    <span class="material-symbols-outlined">description</span>
+                    {{ citation }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      } @else {
+        <!-- Empty state -->
+        <div class="empty-detail">
+          <span class="material-symbols-outlined empty-icon">inbox</span>
+          <p>Select a ticket to view details</p>
+        </div>
+      }
+    </div>
+
   </div>
 </section>

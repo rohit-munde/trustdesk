@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
+import { provideRouter, RouterLink } from '@angular/router';
 import { SideNavbar } from './side-navbar';
 
 describe('SideNavbar', () => {
@@ -14,6 +15,7 @@ describe('SideNavbar', () => {
 
     fixture = TestBed.createComponent(SideNavbar);
     component = fixture.componentInstance;
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
@@ -36,5 +38,19 @@ describe('SideNavbar', () => {
     expect(compiled.querySelector('mat-sidenav')).toBeTruthy();
     expect(compiled.querySelector('mat-nav-list')).toBeTruthy();
     expect(compiled.querySelectorAll('a[mat-list-item]').length).toBe(2);
+  });
+
+  it('should link Tickets to the dashboard tickets route', () => {
+    const ticketsLink = fixture.debugElement
+      .queryAll(By.directive(RouterLink))
+      .find((link) => link.nativeElement.textContent.includes('Tickets'));
+
+    if (!ticketsLink) {
+      throw new Error('Tickets router link was not rendered');
+    }
+
+    const routerLink = ticketsLink.injector.get(RouterLink);
+
+    expect(routerLink.href).toBe('/dashboard/tickets');
   });
 });

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { NotificationService } from '../../core/notification/notification.service';
 import { SideNavbar } from '../side-navbar/side-navbar';
 
@@ -9,7 +9,7 @@ import { SideNavbar } from '../side-navbar/side-navbar';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   standalone: true,
-  imports: [SideNavbar]
+  imports: [SideNavbar, RouterOutlet]
 })
 export class DashboardComponent implements OnInit {
   private router = inject(Router);

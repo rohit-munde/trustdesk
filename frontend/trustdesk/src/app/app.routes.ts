@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './protected/dashboard/dashboard.component';
 
 export const routes: Routes = [
     {
         path: 'dashboard',
-        component: DashboardComponent,
+        loadChildren: () => import('./protected/protected.module').then((module) => module.ProtectedModule),
     },
     {
         path: '',

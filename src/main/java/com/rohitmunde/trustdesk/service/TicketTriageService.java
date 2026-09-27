@@ -5,6 +5,8 @@ import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageContext;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,12 @@ public class TicketTriageService {
         ticket.setDraftReply(result.getDraftReply());
         ticket.setRecommendedAction(result.getRecommendedAction());
         ticket.setCitationsJson(objectMapper.writeValueAsString(result.getCitations()));
+
+        ticket.setActionApprovalStatus(
+                result.getRecommendedAction() == RecommendedAction.NO_ACTION
+                        ? ActionApprovalStatus.NOT_REQUIRED
+                        : ActionApprovalStatus.PENDING_APPROVAL
+        );
 
         ticketRepository.save(ticket);
         return result;

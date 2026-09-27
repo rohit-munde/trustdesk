@@ -2,6 +2,7 @@ package com.rohitmunde.trustdesk.controller;
 
 import com.rohitmunde.trustdesk.dto.TicketDetailsDto;
 import com.rohitmunde.trustdesk.dto.TriageResult;
+import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
 import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
@@ -68,7 +69,8 @@ class TicketControllerTest {
                 .andExpect(jsonPath("$.payload.category").value("GENERAL"))
                 .andExpect(jsonPath("$.payload.sentiment").value("NEUTRAL"))
                 .andExpect(jsonPath("$.payload.escalationRequired").value(false))
-                .andExpect(jsonPath("$.payload.triagedAt").value("2026-06-28T11:15:00+05:30"));
+                .andExpect(jsonPath("$.payload.triagedAt").value("2026-06-28T11:15:00+05:30"))
+                .andExpect(jsonPath("$.payload.actionApprovalStatus").value("PENDING_APPROVAL"));
     }
 
     @Test
@@ -149,6 +151,7 @@ class TicketControllerTest {
                 .sentiment(TicketSentiment.NEUTRAL)
                 .escalationRequired(false)
                 .triagedAt(OffsetDateTime.parse("2026-06-28T11:15:00+05:30"))
+                .actionApprovalStatus(ActionApprovalStatus.PENDING_APPROVAL)
                 .build();
     }
 }

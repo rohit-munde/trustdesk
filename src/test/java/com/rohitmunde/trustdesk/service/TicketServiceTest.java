@@ -4,6 +4,8 @@ import com.rohitmunde.trustdesk.TicketRepository;
 import com.rohitmunde.trustdesk.entity.Customer;
 import com.rohitmunde.trustdesk.entity.Order;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
@@ -11,6 +13,7 @@ import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.enums.TicketStatus;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -25,7 +28,7 @@ import static org.mockito.Mockito.when;
 class TicketServiceTest {
 
     private final TicketRepository ticketRepository = mock(TicketRepository.class);
-    private final TicketService ticketService = new TicketService(ticketRepository);
+    private final TicketService ticketService = new TicketService(ticketRepository, new ObjectMapper());
 
     @Test
     void getsAllTickets() {
@@ -55,6 +58,10 @@ class TicketServiceTest {
         ticket.setTicketSentiment(TicketSentiment.FRUSTRATED);
         ticket.setEscalationRequired(true);
         ticket.setTriagedAt(triagedAt);
+        ticket.setDraftReply("I'm sorry your item arrived damaged.");
+        ticket.setCitationsJson("[\"refund_policy.md\",\"warranty_policy.md\"]");
+        ticket.setRecommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER);
+        ticket.setActionApprovalStatus(ActionApprovalStatus.PENDING_APPROVAL);
         when(ticketRepository.findById("tkt_9001")).thenReturn(Optional.of(ticket));
 
         var response = ticketService.getTicketById("tkt_9001");
@@ -66,6 +73,10 @@ class TicketServiceTest {
         assertThat(response.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         assertThat(response.getEscalationRequired()).isTrue();
         assertThat(response.getTriagedAt()).isEqualTo(triagedAt);
+        assertThat(response.getDraftReply()).isEqualTo("I'm sorry your item arrived damaged.");
+        assertThat(response.getCitations()).containsExactly("refund_policy.md", "warranty_policy.md");
+        assertThat(response.getRecommendedAction()).isEqualTo(RecommendedAction.CREATE_REPLACEMENT_ORDER);
+        assertThat(response.getActionApprovalStatus()).isEqualTo(ActionApprovalStatus.PENDING_APPROVAL);
     }
 
     @Test

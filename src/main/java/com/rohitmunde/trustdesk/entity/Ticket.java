@@ -73,4 +73,8 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     @Column(name = "recommended_action")
     private RecommendedAction recommendedAction;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action_approval_status")
+    private ActionApprovalStatus actionApprovalStatus;
 }

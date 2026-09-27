@@ -10,6 +10,9 @@ import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.service.interfaces.ITicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class TicketService implements ITicketService {
 
     private final TicketRepository ticketRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public TicketDetailsDto getTicketById(String ticketId) {
@@ -72,7 +76,24 @@ public class TicketService implements ITicketService {
                 .sentiment(ticket.getTicketSentiment())
                 .escalationRequired(ticket.getEscalationRequired())
                 .triagedAt(ticket.getTriagedAt())
+                .draftReply(ticket.getDraftReply())
+                .citations(readCitations(ticket.getCitationsJson()))
+                .recommendedAction(ticket.getRecommendedAction())
+                .actionApprovalStatus(ticket.getActionApprovalStatus())
                 .createdAt(ticket.getCreatedAt())
                 .build();
+    }
+
+    private List<String> readCitations(String citationsJson) {
+        if (citationsJson == null || citationsJson.isBlank()) {
+            return List.of();
+        }
+
+        try {
+            return objectMapper.readValue(citationsJson, new TypeReference<>() {
+            });
+        } catch (JacksonException ex) {
+            throw new IllegalStateException("Failed to deserialize ticket citations", ex);
+        }
     }
 }

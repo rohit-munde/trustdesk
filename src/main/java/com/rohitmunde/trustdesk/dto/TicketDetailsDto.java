@@ -44,4 +44,5 @@ public class TicketDetailsDto {
     private String draftReply;
     private List<String> citations;
     private RecommendedAction recommendedAction;
+    private ActionApprovalStatus actionApprovalStatus;
 }

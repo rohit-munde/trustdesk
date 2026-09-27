@@ -2,6 +2,7 @@ package com.rohitmunde.trustdesk.ai;
 
 import com.rohitmunde.trustdesk.dto.TriageContext;
 import com.rohitmunde.trustdesk.dto.TriageResult;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
@@ -29,6 +30,7 @@ public class MockAiClient implements AiClient {
                     .escalationRequired(false)
                     .citations(citations)
                     .draftReply(buildDraftReply(TicketCategory.REFUND))
+                    .recommendedAction(recommendAction(TicketCategory.REFUND))
                     .build();
         }
 
@@ -39,7 +41,19 @@ public class MockAiClient implements AiClient {
                 .escalationRequired(false)
                 .citations(citations)
                 .draftReply(buildDraftReply(TicketCategory.GENERAL))
+                .recommendedAction(recommendAction(TicketCategory.GENERAL))
                 .build();
+    }
+
+    private RecommendedAction recommendAction(TicketCategory category) {
+        return switch (category) {
+            case REFUND -> RecommendedAction.CREATE_REPLACEMENT_ORDER;
+            case SHIPPING -> RecommendedAction.CHECK_SHIPPING_STATUS;
+            case BILLING -> RecommendedAction.REVIEW_BILLING_CHARGE;
+            case WARRANTY -> RecommendedAction.REVIEW_WARRANTY_CLAIM;
+            case ACCOUNT_SECURITY -> RecommendedAction.REVIEW_ACCOUNT_SECURITY;
+            case GENERAL -> RecommendedAction.NO_ACTION;
+        };
     }
 
     private String buildDraftReply(TicketCategory category) {

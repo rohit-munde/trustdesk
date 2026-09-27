@@ -80,6 +80,9 @@ public class TicketService implements ITicketService {
                 .citations(readCitations(ticket.getCitationsJson()))
                 .recommendedAction(ticket.getRecommendedAction())
                 .actionApprovalStatus(ticket.getActionApprovalStatus())
+                .actionExecutionStatus(ticket.getActionExecutionStatus())
+                .actionExecutionReference(ticket.getActionExecutionReference())
+                .actionExecutedAt(ticket.getActionExecutedAt())
                 .createdAt(ticket.getCreatedAt())
                 .build();
     }

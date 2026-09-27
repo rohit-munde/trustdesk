@@ -3,6 +3,7 @@ package com.rohitmunde.trustdesk.controller;
 import com.rohitmunde.trustdesk.dto.TicketDetailsDto;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.ActionExecutionStatus;
 import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
@@ -152,6 +153,17 @@ class TicketControllerTest {
     }
 
     @Test
+    void executesTicketAction() throws Exception {
+        when(ticketActionService.executeAction("tkt_9001"))
+                .thenReturn(executedTicket("tkt_9001"));
+
+        mockMvc.perform(post("/tickets/tkt_9001/actions/execute"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.payload.actionExecutionStatus").value("EXECUTED"))
+                .andExpect(jsonPath("$.payload.actionExecutionReference").value("replacement_order:tkt_9001"));
+    }
+
+    @Test
     void invalidEnumValueReturnsBadRequest() throws Exception {
         mockMvc.perform(patch("/tickets/tkt_9001/status")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -190,6 +202,17 @@ class TicketControllerTest {
                 .escalationRequired(false)
                 .triagedAt(OffsetDateTime.parse("2026-06-28T11:15:00+05:30"))
                 .actionApprovalStatus(actionApprovalStatus)
+                .actionExecutionStatus(ActionExecutionStatus.NOT_STARTED)
+                .build();
+    }
+
+    private TicketDetailsDto executedTicket(String id) {
+        return TicketDetailsDto.builder()
+                .ticketId(id)
+                .actionApprovalStatus(ActionApprovalStatus.APPROVED)
+                .actionExecutionStatus(ActionExecutionStatus.EXECUTED)
+                .actionExecutionReference("replacement_order:" + id)
+                .actionExecutedAt(OffsetDateTime.parse("2026-06-28T12:15:00+05:30"))
                 .build();
     }
 }

@@ -5,6 +5,8 @@ import com.rohitmunde.trustdesk.entity.Customer;
 import com.rohitmunde.trustdesk.entity.Order;
 import com.rohitmunde.trustdesk.entity.Ticket;
 import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.ActionExecutionStatus;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
@@ -73,6 +75,49 @@ class TicketActionServiceTest {
                 .hasMessage("Ticket not found with id: missing");
     }
 
+    @Test
+    void executesApprovedAction() {
+        Ticket ticket = ticket("tkt_9001", ActionApprovalStatus.APPROVED);
+        ticket.setRecommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER);
+        when(ticketRepository.findById("tkt_9001")).thenReturn(Optional.of(ticket));
+
+        var response = ticketActionService.executeAction("tkt_9001");
+
+        assertThat(ticket.getActionExecutionStatus()).isEqualTo(ActionExecutionStatus.EXECUTED);
+        assertThat(ticket.getActionExecutionReference()).isEqualTo("replacement_order:tkt_9001");
+        assertThat(ticket.getActionExecutedAt()).isNotNull();
+        assertThat(response.getActionExecutionStatus()).isEqualTo(ActionExecutionStatus.EXECUTED);
+        assertThat(response.getActionExecutionReference()).isEqualTo("replacement_order:tkt_9001");
+        verify(ticketRepository).save(ticket);
+    }
+
+    @Test
+    void executionIsIdempotentWhenAlreadyExecuted() {
+        Ticket ticket = ticket("tkt_9001", ActionApprovalStatus.APPROVED);
+        OffsetDateTime executedAt = OffsetDateTime.parse("2026-06-28T12:15:00+05:30");
+        ticket.setRecommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER);
+        ticket.setActionExecutionStatus(ActionExecutionStatus.EXECUTED);
+        ticket.setActionExecutionReference("replacement_order:tkt_9001");
+        ticket.setActionExecutedAt(executedAt);
+        when(ticketRepository.findById("tkt_9001")).thenReturn(Optional.of(ticket));
+
+        var response = ticketActionService.executeAction("tkt_9001");
+
+        assertThat(ticket.getActionExecutedAt()).isEqualTo(executedAt);
+        assertThat(response.getActionExecutionStatus()).isEqualTo(ActionExecutionStatus.EXECUTED);
+        assertThat(response.getActionExecutionReference()).isEqualTo("replacement_order:tkt_9001");
+    }
+
+    @Test
+    void pendingActionCannotExecute() {
+        Ticket ticket = ticket("tkt_9001", ActionApprovalStatus.PENDING_APPROVAL);
+        when(ticketRepository.findById("tkt_9001")).thenReturn(Optional.of(ticket));
+
+        assertThatThrownBy(() -> ticketActionService.executeAction("tkt_9001"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Ticket action must be approved before execution");
+    }
+
     private Ticket ticket(String id, ActionApprovalStatus actionApprovalStatus) {
         Customer customer = new Customer();
         customer.setId("cus_1001");
@@ -93,7 +138,9 @@ class TicketActionServiceTest {
         ticket.setTicketCategory(TicketCategory.REFUND);
         ticket.setTicketSentiment(TicketSentiment.FRUSTRATED);
         ticket.setEscalationRequired(false);
+        ticket.setRecommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER);
         ticket.setActionApprovalStatus(actionApprovalStatus);
+        ticket.setActionExecutionStatus(ActionExecutionStatus.NOT_STARTED);
         return ticket;
     }
 }

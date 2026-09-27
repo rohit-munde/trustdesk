@@ -68,4 +68,10 @@ public class TicketController {
         TicketDetailsDto ticketDetailsDto = ticketActionService.rejectAction(ticketId);
         return new ApiSuccessResponse<>(MessageConstants.TICKET_UPDATE_SUCCESS, ticketDetailsDto);
     }
+
+    @PostMapping("/{ticketId}/actions/execute")
+    public ApiSuccessResponse<TicketDetailsDto> executeAction(@PathVariable String ticketId) {
+        TicketDetailsDto ticketDetailsDto = ticketActionService.executeAction(ticketId);
+        return new ApiSuccessResponse<>(MessageConstants.TICKET_UPDATE_SUCCESS, ticketDetailsDto);
+    }
 }

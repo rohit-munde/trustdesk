@@ -45,4 +45,7 @@ public class TicketDetailsDto {
     private List<String> citations;
     private RecommendedAction recommendedAction;
     private ActionApprovalStatus actionApprovalStatus;
+    private ActionExecutionStatus actionExecutionStatus;
+    private String actionExecutionReference;
+    private OffsetDateTime actionExecutedAt;
 }

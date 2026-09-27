@@ -10,6 +10,8 @@ import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.enums.TicketStatus;
 import com.rohitmunde.trustdesk.exception.GlobalExceptionHandler;
+import com.rohitmunde.trustdesk.exception.BusinessException;
+import com.rohitmunde.trustdesk.service.TicketActionService;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.service.TicketService;
 import com.rohitmunde.trustdesk.service.TicketTriageService;
@@ -34,14 +36,16 @@ class TicketControllerTest {
 
     private TicketService ticketService;
     private TicketTriageService ticketTriageService;
+    private TicketActionService ticketActionService;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         ticketService = mock(TicketService.class);
         ticketTriageService = mock(TicketTriageService.class);
+        ticketActionService = mock(TicketActionService.class);
         mockMvc = MockMvcBuilders
-                .standaloneSetup(new TicketController(ticketService, ticketTriageService))
+                .standaloneSetup(new TicketController(ticketService, ticketTriageService, ticketActionService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -118,6 +122,36 @@ class TicketControllerTest {
     }
 
     @Test
+    void approvesTicketAction() throws Exception {
+        when(ticketActionService.approveAction("tkt_9001"))
+                .thenReturn(ticket("tkt_9001", ActionApprovalStatus.APPROVED));
+
+        mockMvc.perform(post("/tickets/tkt_9001/actions/approve"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.payload.actionApprovalStatus").value("APPROVED"));
+    }
+
+    @Test
+    void rejectsTicketAction() throws Exception {
+        when(ticketActionService.rejectAction("tkt_9001"))
+                .thenReturn(ticket("tkt_9001", ActionApprovalStatus.REJECTED));
+
+        mockMvc.perform(post("/tickets/tkt_9001/actions/reject"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.payload.actionApprovalStatus").value("REJECTED"));
+    }
+
+    @Test
+    void actionDecisionReturnsBadRequestWhenNotPending() throws Exception {
+        when(ticketActionService.approveAction("tkt_9001"))
+                .thenThrow(new BusinessException("Ticket action is not pending approval", org.springframework.http.HttpStatus.BAD_REQUEST));
+
+        mockMvc.perform(post("/tickets/tkt_9001/actions/approve"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Ticket action is not pending approval"));
+    }
+
+    @Test
     void invalidEnumValueReturnsBadRequest() throws Exception {
         mockMvc.perform(patch("/tickets/tkt_9001/status")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,6 +171,10 @@ class TicketControllerTest {
     }
 
     private TicketDetailsDto ticket(String id) {
+        return ticket(id, ActionApprovalStatus.PENDING_APPROVAL);
+    }
+
+    private TicketDetailsDto ticket(String id, ActionApprovalStatus actionApprovalStatus) {
         return TicketDetailsDto.builder()
                 .ticketId(id)
                 .channel(TicketChannel.EMAIL)
@@ -151,7 +189,7 @@ class TicketControllerTest {
                 .sentiment(TicketSentiment.NEUTRAL)
                 .escalationRequired(false)
                 .triagedAt(OffsetDateTime.parse("2026-06-28T11:15:00+05:30"))
-                .actionApprovalStatus(ActionApprovalStatus.PENDING_APPROVAL)
+                .actionApprovalStatus(actionApprovalStatus)
                 .build();
     }
 }

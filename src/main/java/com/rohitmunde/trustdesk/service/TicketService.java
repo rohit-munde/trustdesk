@@ -62,7 +62,7 @@ public class TicketService implements ITicketService {
                 .orElseThrow(() -> new TicketNotFoundException(String.format(MessageConstants.TICKET_NOT_FOUND, id)));
     }
 
-    private TicketDetailsDto toDetailsDto(Ticket ticket) {
+    TicketDetailsDto toDetailsDto(Ticket ticket) {
         return TicketDetailsDto.builder()
                 .ticketId(ticket.getId())
                 .customerId(ticket.getCustomer().getId())

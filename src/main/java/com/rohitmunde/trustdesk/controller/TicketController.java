@@ -6,6 +6,7 @@ import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.dto.UpdateTicketPriorityRequest;
 import com.rohitmunde.trustdesk.dto.UpdateTicketStatusRequest;
 import com.rohitmunde.trustdesk.response.ApiSuccessResponse;
+import com.rohitmunde.trustdesk.service.TicketActionService;
 import com.rohitmunde.trustdesk.service.TicketService;
 import com.rohitmunde.trustdesk.service.TicketTriageService;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import java.util.List;
 public class TicketController {
     private final TicketService ticketService;
     private final TicketTriageService ticketTriageService;
+    private final TicketActionService ticketActionService;
 
     @GetMapping("/{ticketId}")
     public ApiSuccessResponse<TicketDetailsDto> getTicketById(@PathVariable String ticketId) {
@@ -53,5 +55,17 @@ public class TicketController {
     public ApiSuccessResponse<TriageResult> triageTicket(@PathVariable String ticketId) {
         TriageResult triageResult = ticketTriageService.triageTicket(ticketId);
         return new ApiSuccessResponse<>(MessageConstants.TICKET_TRIAGE_SUCCESS, triageResult);
+    }
+
+    @PostMapping("/{ticketId}/actions/approve")
+    public ApiSuccessResponse<TicketDetailsDto> approveAction(@PathVariable String ticketId) {
+        TicketDetailsDto ticketDetailsDto = ticketActionService.approveAction(ticketId);
+        return new ApiSuccessResponse<>(MessageConstants.TICKET_UPDATE_SUCCESS, ticketDetailsDto);
+    }
+
+    @PostMapping("/{ticketId}/actions/reject")
+    public ApiSuccessResponse<TicketDetailsDto> rejectAction(@PathVariable String ticketId) {
+        TicketDetailsDto ticketDetailsDto = ticketActionService.rejectAction(ticketId);
+        return new ApiSuccessResponse<>(MessageConstants.TICKET_UPDATE_SUCCESS, ticketDetailsDto);
     }
 }

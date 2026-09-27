@@ -61,4 +61,16 @@ public class Ticket {
 
     @Column
     private Boolean escalationRequired;
+
+    @Lob
+    @Column(name = "draft_reply", columnDefinition = "TEXT")
+    private String draftReply;
+
+    @Lob
+    @Column(name = "citations_json", columnDefinition = "TEXT")
+    private String citationsJson;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recommended_action")
+    private RecommendedAction recommendedAction;
 }

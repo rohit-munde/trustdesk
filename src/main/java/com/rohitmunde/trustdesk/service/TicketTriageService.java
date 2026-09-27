@@ -10,6 +10,7 @@ import com.rohitmunde.trustdesk.model.KnowledgeDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -21,6 +22,7 @@ public class TicketTriageService {
     private final TicketRepository ticketRepository;
     private final KnowledgeBaseService knowledgeBaseService;
     private final AiClient aiClient;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public TriageResult triageTicket(String ticketId) {
@@ -45,6 +47,9 @@ public class TicketTriageService {
         ticket.setTicketSentiment(result.getSentiment());
         ticket.setEscalationRequired(result.getEscalationRequired());
         ticket.setTriagedAt(OffsetDateTime.now());
+        ticket.setDraftReply(result.getDraftReply());
+        ticket.setRecommendedAction(result.getRecommendedAction());
+        ticket.setCitationsJson(objectMapper.writeValueAsString(result.getCitations()));
 
         ticketRepository.save(ticket);
         return result;

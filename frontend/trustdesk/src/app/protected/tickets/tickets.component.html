@@ -1,0 +1,202 @@
+<section class="tickets-page">
+
+  <!-- Page header -->
+  <header class="tickets-header">
+    <h1>Support Tickets</h1>
+    <span class="ticket-count">{{ tickets().length }} tickets</span>
+  </header>
+
+  <!-- Two-panel layout -->
+  <div class="tickets-layout">
+
+    <!-- LEFT PANEL — ticket list -->
+    <div class="tickets-list-panel">
+      <div class="tickets-list">
+        @for (ticket of tickets(); track ticket.ticketId) {
+          <article
+            class="ticket-row"
+            [ngClass]="{ selected: ticket.ticketId === selectedId() }"
+            (click)="select(ticket)"
+            (keydown.enter)="select(ticket)"
+            tabindex="0"
+            [attr.aria-label]="'View ticket: ' + ticket.subject"
+            [attr.aria-pressed]="ticket.ticketId === selectedId()"
+          >
+            <span class="status-dot" [ngClass]="priorityDotClass(ticket.priority)"></span>
+
+            <div class="ticket-copy">
+              <h2>{{ ticket.subject }}</h2>
+              <p>{{ ticket.body }}</p>
+            </div>
+
+            <time [dateTime]="ticket.createdAt">
+              {{ ticket.createdAt | date : 'MMM d' }}
+            </time>
+          </article>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL — ticket detail -->
+    <div class="ticket-detail-panel" [ngClass]="{ 'detail-visible': selectedTicket() !== null }">
+      @if (selectedTicket(); as ticket) {
+        <div class="detail-scroll">
+
+          <!-- Detail header -->
+          <div class="detail-header">
+            <div class="detail-title-row">
+              <h2 class="detail-title">{{ ticket.subject }}</h2>
+              <span class="status-badge" [ngClass]="statusClass(ticket.status)">
+                {{ statusLabel(ticket.status) }}
+              </span>
+            </div>
+            <p class="detail-id">{{ ticket.ticketId }}</p>
+            <div class="detail-actions">
+              <label class="action-field">
+                <span>Status</span>
+                <select
+                  [value]="ticket.status"
+                  [disabled]="isActionLoading('status', ticket.ticketId)"
+                  (change)="updateStatus(ticket.ticketId, $any($event.target).value)"
+                >
+                  @for (status of statusOptions; track status) {
+                    <option [value]="status">{{ statusLabel(status) }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="action-field">
+                <span>Priority</span>
+                <select
+                  [value]="ticket.priority"
+                  [disabled]="isActionLoading('priority', ticket.ticketId)"
+                  (change)="updatePriority(ticket.ticketId, $any($event.target).value)"
+                >
+                  @for (priority of priorityOptions; track priority) {
+                    <option [value]="priority">{{ priority }}</option>
+                  }
+                </select>
+              </label>
+
+              <button
+                class="triage-btn"
+                type="button"
+                [disabled]="isActionLoading('triage', ticket.ticketId)"
+                (click)="runTriage(ticket.ticketId)"
+              >
+                <span class="material-symbols-outlined">psychology</span>
+                {{ isActionLoading('triage', ticket.ticketId) ? 'Triaging...' : 'Run triage' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">receipt_long</span>
+              Ticket Context
+            </h3>
+            <div class="info-card">
+              <div class="info-row">
+                <span class="info-label">Customer ID</span>
+                <span class="info-value">{{ ticket.customerId }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Order ID</span>
+                <span class="info-value">{{ ticket.orderId }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Channel</span>
+                <span class="info-value">{{ ticket.channel }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Original message -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">mail</span>
+              Message
+            </h3>
+            <div class="message-card">
+              <p>{{ ticket.body }}</p>
+            </div>
+          </div>
+
+          <!-- AI Triage -->
+          <div class="detail-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined section-icon">psychology</span>
+              AI Triage
+            </h3>
+            <div class="triage-grid">
+              <div class="triage-chip">
+                <span class="chip-label">Category</span>
+                <span class="chip-value">{{ categoryLabel(ticket.category) }}</span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Priority</span>
+                <span class="chip-value priority-chip" [ngClass]="'priority-' + ticket.priority.toLowerCase()">
+                  {{ ticket.priority }}
+                </span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Sentiment</span>
+                <span class="chip-value sentiment-chip" [ngClass]="sentimentClass(ticket.sentiment)">
+                  <span class="material-symbols-outlined sentiment-icon">{{ sentimentIcon(ticket.sentiment) }}</span>
+                  {{ ticket.sentiment }}
+                </span>
+              </div>
+              <div class="triage-chip">
+                <span class="chip-label">Escalation</span>
+                <span class="chip-value escalation-chip" [ngClass]="ticket.escalationRequired ? 'escalate-yes' : 'escalate-no'">
+                  <span class="material-symbols-outlined">{{ ticket.escalationRequired ? 'warning' : 'check_circle' }}</span>
+                  {{ ticket.escalationRequired ? 'Required' : 'Not required' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          @if (selectedTriageResult(); as triageResult) {
+            <div class="detail-section">
+              <h3 class="section-title">
+                <span class="material-symbols-outlined section-icon">quickreply</span>
+                Draft Reply
+              </h3>
+              <div class="draft-card">
+                <p>{{ triageResult.draftReply }}</p>
+                <button class="copy-btn" type="button" (click)="copyReply(triageResult.draftReply)">
+                  <span class="material-symbols-outlined">{{ copiedReply ? 'check' : 'content_copy' }}</span>
+                  {{ copiedReply ? 'Copied' : 'Copy reply' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3 class="section-title">
+                <span class="material-symbols-outlined section-icon">policy</span>
+                Citations
+              </h3>
+              <div class="citations-list">
+                @for (citation of triageResult.citations; track citation) {
+                  <span class="citation-tag">
+                    <span class="material-symbols-outlined">description</span>
+                    {{ citation }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      } @else {
+        <!-- Empty state -->
+        <div class="empty-detail">
+          <span class="material-symbols-outlined empty-icon">inbox</span>
+          <p>Select a ticket to view details</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</section>

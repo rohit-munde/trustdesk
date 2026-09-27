@@ -1,6 +1,7 @@
 package com.rohitmunde.trustdesk.ai;
 
 import com.rohitmunde.trustdesk.dto.TriageContext;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
@@ -25,6 +26,7 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         Assertions.assertThat(result.getCitations()).containsExactly("refund_policy.md");
         Assertions.assertThat(result.getDraftReply()).isEqualTo("I'm sorry your item arrived damaged. Based on our refund and replacement policy, we can help review this for a refund or replacement.");
+        Assertions.assertThat(result.getRecommendedAction()).isEqualTo(RecommendedAction.CREATE_REPLACEMENT_ORDER);
     }
 
     @Test
@@ -40,6 +42,7 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.NEUTRAL);
         Assertions.assertThat(result.getCitations()).containsExactly("account_security_policy.md");
         Assertions.assertThat(result.getDraftReply()).isEqualTo("Thank you for your patience. We're looking into this for you.");
+        Assertions.assertThat(result.getRecommendedAction()).isEqualTo(RecommendedAction.NO_ACTION);
     }
 
     private KnowledgeDocument policy(String sourceFile) {

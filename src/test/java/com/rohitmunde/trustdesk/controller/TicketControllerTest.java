@@ -2,6 +2,7 @@ package com.rohitmunde.trustdesk.controller;
 
 import com.rohitmunde.trustdesk.dto.TicketDetailsDto;
 import com.rohitmunde.trustdesk.dto.TriageResult;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketChannel;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
@@ -102,12 +103,16 @@ class TicketControllerTest {
                 .sentiment(TicketSentiment.FRUSTRATED)
                 .escalationRequired(false)
                 .citations(List.of("refund_policy.md"))
+                .draftReply("I'm sorry your item arrived damaged. Based on our refund and replacement policy, we can help review this for a refund or replacement.")
+                .recommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER)
                 .build());
 
         mockMvc.perform(post("/tickets/tkt_9001/triage"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.payload.category").value("REFUND"))
-                .andExpect(jsonPath("$.payload.citations[0]").value("refund_policy.md"));
+                .andExpect(jsonPath("$.payload.citations[0]").value("refund_policy.md"))
+                .andExpect(jsonPath("$.payload.draftReply").isNotEmpty())
+                .andExpect(jsonPath("$.payload.recommendedAction").value("CREATE_REPLACEMENT_ORDER"));
     }
 
     @Test

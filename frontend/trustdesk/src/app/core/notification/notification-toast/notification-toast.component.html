@@ -1,0 +1,32 @@
+<div class="toast-card" [ngClass]="notification.type">
+  <div class="rowCenterStart">
+    <mat-icon class="material-symbols-outlined status-icon" [ngClass]="notification.type">{{ getIconName()
+      }}</mat-icon>
+    <h3>{{getNotificationTitle()}}</h3>
+
+    @if (notification.count > 1) {
+    <div class="count-badge">
+      failed {{ notification.count }} times
+    </div>
+    }
+
+    <div class="toast-actions">
+      @if (notification.errorResponse) {
+      <button mat-icon-button class="action-btn copy-btn" [class.copied]="isCopied" (click)="copyError()" aria-label="Copy Error"
+        title="Copy error details">
+        <mat-icon class="material-symbols-outlined">{{ isCopied ? 'check' : 'content_copy' }}</mat-icon>
+      </button>
+      }
+      <button mat-icon-button class="action-btn close-btn" (click)="close()" aria-label="Close notification"
+        title="Close">
+        <mat-icon class="material-symbols-outlined">close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="rowCenterStart">
+    <div class="message-container">
+      <span class="message">{{notification.message}}</span>
+    </div>
+  </div>
+</div>

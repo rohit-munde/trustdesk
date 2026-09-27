@@ -1,0 +1,19 @@
+<mat-sidenav-container class="side-navbar-container" autosize>
+  <mat-sidenav class="side-navbar" mode="side" opened aria-label="Primary navigation">
+    <a class="brand" routerLink="/dashboard" aria-label="TrustDesk dashboard">
+      <span class="brand-text">Trust<span>Desk</span></span>
+    </a>
+
+    <mat-nav-list class="nav-links">
+      <a mat-list-item class="nav-link" routerLink="/dashboard/tickets" routerLinkActive="active" ariaCurrentWhenActive="page">
+        <mat-icon matListItemIcon class="nav-icon" fontSet="material-symbols-outlined">confirmation_number</mat-icon>
+        <span matListItemTitle>Tickets</span>
+      </a>
+
+      <a mat-list-item class="nav-link" routerLink="/dashboard/evaluations">
+        <mat-icon matListItemIcon class="nav-icon" fontSet="material-symbols-outlined">bar_chart_4_bars</mat-icon>
+        <span matListItemTitle>Evaluations</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+</mat-sidenav-container>

@@ -1,5 +1,6 @@
 package com.rohitmunde.trustdesk.dto;
 
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
@@ -21,4 +22,5 @@ public class TriageResult {
     private Boolean escalationRequired;
     private List<String> citations;
     private String draftReply;
+    private RecommendedAction recommendedAction;
 }

@@ -218,6 +218,84 @@ $radius-lg:      14px;
   font-weight: 500;
 }
 
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.action-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 150px;
+
+  span {
+    color: $text-muted;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  select {
+    height: 36px;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    background: $surface;
+    color: $text-dark;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 34px 0 10px;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: wait;
+      color: $text-muted;
+      background: #f1f5f9;
+    }
+  }
+}
+
+.triage-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid $primary;
+  border-radius: $radius-sm;
+  background: $primary;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 14px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+
+  .material-symbols-outlined {
+    font-size: 17px;
+  }
+
+  &:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+}
+
 // ─── Status badge ─────────────────────────────────────────
 .status-badge {
   flex-shrink: 0;
@@ -353,6 +431,7 @@ $radius-lg:      14px;
   width: fit-content;
 
   &.priority-high   { background: #fee2e2; color: #991b1b; }
+  &.priority-urgent { background: #fee2e2; color: #7f1d1d; }
   &.priority-medium { background: #fef3c7; color: #92400e; }
   &.priority-low    { background: #f1f5f9; color: #475569; }
 }
@@ -491,5 +570,11 @@ $radius-lg:      14px;
 
   .tickets-header h1 {
     font-size: 26px;
+  }
+
+  .detail-actions,
+  .action-field,
+  .triage-btn {
+    width: 100%;
   }
 }

@@ -1,0 +1,8 @@
+export enum TicketCategory {
+    SHIPPING = 'SHIPPING',
+    REFUND = 'REFUND',
+    WARRANTY = 'WARRANTY',
+    BILLING = 'BILLING',
+    ACCOUNT_SECURITY = 'ACCOUNT_SECURITY',
+    GENERAL = 'GENERAL'
+}

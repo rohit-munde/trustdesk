@@ -1,13 +1,10 @@
 package com.rohitmunde.trustdesk.dto;
 
-import com.rohitmunde.trustdesk.enums.TicketChannel;
-import com.rohitmunde.trustdesk.enums.TicketCategory;
-import com.rohitmunde.trustdesk.enums.TicketPriority;
-import com.rohitmunde.trustdesk.enums.TicketSentiment;
-import com.rohitmunde.trustdesk.enums.TicketStatus;
+import com.rohitmunde.trustdesk.enums.*;
 import lombok.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 
 /**
@@ -44,4 +41,11 @@ public class TicketDetailsDto {
     private TicketSentiment sentiment;
     private Boolean escalationRequired;
     private OffsetDateTime triagedAt;
+    private String draftReply;
+    private List<String> citations;
+    private RecommendedAction recommendedAction;
+    private ActionApprovalStatus actionApprovalStatus;
+    private ActionExecutionStatus actionExecutionStatus;
+    private String actionExecutionReference;
+    private OffsetDateTime actionExecutedAt;
 }

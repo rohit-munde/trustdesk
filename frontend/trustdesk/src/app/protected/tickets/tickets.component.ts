@@ -1,7 +1,7 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { TicketService } from '../service/ticket-service';
-import { ITicketPayload, ITicketResponse, ITriagePayload } from '../../interface/response';
+import { ActionApprovalStatus, ActionExecutionStatus, ITicketPayload, ITicketResponse, ITriagePayload, RecommendedAction } from '../../interface/response';
 import { TicketPriority } from '../../enum/TicketPriority.enum';
 import { TicketStatus } from '../../enum/TicketStatus.enum';
 
@@ -83,6 +83,7 @@ export class TicketsComponent implements OnInit {
           priority: triageResult.priority,
           sentiment: triageResult.sentiment,
           escalationRequired: triageResult.escalationRequired,
+          recommendedAction: triageResult.recommendedAction,
         });
       },
       error: () => this.actionInFlight.set(null),
@@ -90,7 +91,37 @@ export class TicketsComponent implements OnInit {
     });
   }
 
-  isActionLoading(action: 'status' | 'priority' | 'triage', ticketId: string): boolean {
+  approveAction(ticketId: string): void {
+    this.actionInFlight.set(`approve:${ticketId}`);
+
+    this.ticketService.approveTicketAction(ticketId).subscribe({
+      next: (response) => this.replaceTicket(response.payload),
+      error: () => this.actionInFlight.set(null),
+      complete: () => this.actionInFlight.set(null),
+    });
+  }
+
+  rejectAction(ticketId: string): void {
+    this.actionInFlight.set(`reject:${ticketId}`);
+
+    this.ticketService.rejectTicketAction(ticketId).subscribe({
+      next: (response) => this.replaceTicket(response.payload),
+      error: () => this.actionInFlight.set(null),
+      complete: () => this.actionInFlight.set(null),
+    });
+  }
+
+  executeAction(ticketId: string): void {
+    this.actionInFlight.set(`execute:${ticketId}`);
+
+    this.ticketService.executeTicketAction(ticketId).subscribe({
+      next: (response) => this.replaceTicket(response.payload),
+      error: () => this.actionInFlight.set(null),
+      complete: () => this.actionInFlight.set(null),
+    });
+  }
+
+  isActionLoading(action: 'status' | 'priority' | 'triage' | 'approve' | 'reject' | 'execute', ticketId: string): boolean {
     return this.actionInFlight() === `${action}:${ticketId}`;
   }
 
@@ -113,6 +144,37 @@ export class TicketsComponent implements OnInit {
 
   categoryLabel(category: string): string {
     return category.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  actionLabel(action: RecommendedAction | null | undefined): string {
+    if (!action || action === 'NO_ACTION') {
+      return 'No action';
+    }
+
+    return this.categoryLabel(action);
+  }
+
+  approvalLabel(status: ActionApprovalStatus | null | undefined): string {
+    return this.categoryLabel(status ?? 'PENDING_APPROVAL');
+  }
+
+  executionLabel(status: ActionExecutionStatus | null | undefined): string {
+    return this.categoryLabel(status ?? 'NOT_STARTED');
+  }
+
+  canApproveAction(ticket: ITicketPayload): boolean {
+    return ticket.recommendedAction !== undefined
+      && ticket.recommendedAction !== null
+      && ticket.recommendedAction !== 'NO_ACTION'
+      && ticket.actionApprovalStatus === 'PENDING_APPROVAL';
+  }
+
+  canExecuteAction(ticket: ITicketPayload): boolean {
+    return ticket.recommendedAction !== undefined
+      && ticket.recommendedAction !== null
+      && ticket.recommendedAction !== 'NO_ACTION'
+      && ticket.actionApprovalStatus === 'APPROVED'
+      && ticket.actionExecutionStatus !== 'EXECUTED';
   }
 
   sentimentIcon(sentiment: string): string {

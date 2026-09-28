@@ -39,4 +39,16 @@ export class TicketService {
         return this.http.post<ITriageResponse>(`${this.baseURL}/tickets/${ticketId}/triage`, null);
     }
 
+    approveTicketAction(ticketId: string): Observable<ISingleTicketResponse> {
+        return this.http.post<ISingleTicketResponse>(`${this.baseURL}/tickets/${ticketId}/actions/approve`, null);
+    }
+
+    rejectTicketAction(ticketId: string): Observable<ISingleTicketResponse> {
+        return this.http.post<ISingleTicketResponse>(`${this.baseURL}/tickets/${ticketId}/actions/reject`, null);
+    }
+
+    executeTicketAction(ticketId: string): Observable<ISingleTicketResponse> {
+        return this.http.post<ISingleTicketResponse>(`${this.baseURL}/tickets/${ticketId}/actions/execute`, null);
+    }
+
 }

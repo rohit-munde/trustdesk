@@ -4,6 +4,8 @@ import com.rohitmunde.trustdesk.TicketRepository;
 import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,9 @@ public class TicketTriageServiceTest {
 
     @Mock
     private AiClient aiClient;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private TicketTriageService ticketTriageService;
@@ -56,6 +62,8 @@ public class TicketTriageServiceTest {
                 .sentiment(TicketSentiment.FRUSTRATED)
                 .escalationRequired(false)
                 .citations(List.of(policy.getSourceFile()))
+                .draftReply("I'm sorry your item arrived damaged.")
+                .recommendedAction(RecommendedAction.CREATE_REPLACEMENT_ORDER)
                 .build();
 
         when(ticketRepository.findById(ticket.getId())).thenReturn(Optional.of(ticket));
@@ -64,6 +72,8 @@ public class TicketTriageServiceTest {
                 .thenReturn(List.of(policy));
 
         when(aiClient.triage(any())).thenReturn(triageResult);
+        when(objectMapper.writeValueAsString(triageResult.getCitations()))
+                .thenReturn("[\"replacement-policy.md\"]");
 
         TriageResult triagedResult = ticketTriageService.triageTicket(ticket.getId());
 
@@ -73,6 +83,10 @@ public class TicketTriageServiceTest {
         Assertions.assertThat(ticket.getTicketSentiment()).isEqualTo(TicketSentiment.FRUSTRATED);
         Assertions.assertThat(ticket.getEscalationRequired()).isFalse();
         Assertions.assertThat(ticket.getTriagedAt()).isNotNull();
+        Assertions.assertThat(ticket.getDraftReply()).isEqualTo("I'm sorry your item arrived damaged.");
+        Assertions.assertThat(ticket.getRecommendedAction()).isEqualTo(RecommendedAction.CREATE_REPLACEMENT_ORDER);
+        Assertions.assertThat(ticket.getCitationsJson()).isEqualTo("[\"replacement-policy.md\"]");
+        Assertions.assertThat(ticket.getActionApprovalStatus()).isEqualTo(ActionApprovalStatus.PENDING_APPROVAL);
     }
 
     @Test

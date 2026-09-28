@@ -1,5 +1,6 @@
 package com.rohitmunde.trustdesk;
 
+import com.rohitmunde.trustdesk.repository.TicketRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

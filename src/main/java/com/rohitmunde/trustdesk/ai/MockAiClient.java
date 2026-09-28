@@ -7,11 +7,13 @@ import com.rohitmunde.trustdesk.enums.TicketCategory;
 import com.rohitmunde.trustdesk.enums.TicketPriority;
 import com.rohitmunde.trustdesk.enums.TicketSentiment;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(name = "trustdesk.ai.provider", havingValue = "mock", matchIfMissing = true)
 public class MockAiClient implements AiClient {
 
     @Override

@@ -77,4 +77,37 @@ describe('TicketService', () => {
 
     request.flush({ success: true, message: 'Ticket triaged successfully', payload: {} });
   });
+
+  it('approves a ticket action', () => {
+    service.approveTicketAction('tkt_9001').subscribe();
+
+    const request = httpTesting.expectOne('/tickets/tkt_9001/actions/approve');
+
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBeNull();
+
+    request.flush({ success: true, message: 'Ticket updated successfully', payload: {} });
+  });
+
+  it('rejects a ticket action', () => {
+    service.rejectTicketAction('tkt_9001').subscribe();
+
+    const request = httpTesting.expectOne('/tickets/tkt_9001/actions/reject');
+
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBeNull();
+
+    request.flush({ success: true, message: 'Ticket updated successfully', payload: {} });
+  });
+
+  it('executes a ticket action', () => {
+    service.executeTicketAction('tkt_9001').subscribe();
+
+    const request = httpTesting.expectOne('/tickets/tkt_9001/actions/execute');
+
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBeNull();
+
+    request.flush({ success: true, message: 'Ticket updated successfully', payload: {} });
+  });
 });

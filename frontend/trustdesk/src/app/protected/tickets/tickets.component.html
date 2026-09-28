@@ -157,6 +157,73 @@
             </div>
           </div>
 
+          @if (ticket.recommendedAction) {
+            <div class="detail-section">
+              <h3 class="section-title">
+                <span class="material-symbols-outlined section-icon">task_alt</span>
+                Recommended Action
+              </h3>
+              <div class="action-card">
+                <div class="action-summary">
+                  <div>
+                    <span class="action-label">Action</span>
+                    <strong>{{ actionLabel(ticket.recommendedAction) }}</strong>
+                  </div>
+                  <span class="action-state" [ngClass]="'approval-' + (ticket.actionApprovalStatus ?? 'PENDING_APPROVAL').toLowerCase().replace('_', '-')">
+                    {{ approvalLabel(ticket.actionApprovalStatus) }}
+                  </span>
+                </div>
+
+                <div class="action-meta">
+                  <span>Execution: {{ executionLabel(ticket.actionExecutionStatus) }}</span>
+                  @if (ticket.actionExecutionReference) {
+                    <span>Reference: {{ ticket.actionExecutionReference }}</span>
+                  }
+                  @if (ticket.actionExecutedAt) {
+                    <span>Executed: {{ ticket.actionExecutedAt | date : 'MMM d, h:mm a' }}</span>
+                  }
+                </div>
+
+                @if (canApproveAction(ticket)) {
+                  <div class="action-buttons">
+                    <button
+                      class="secondary-action-btn"
+                      type="button"
+                      [disabled]="isActionLoading('reject', ticket.ticketId)"
+                      (click)="rejectAction(ticket.ticketId)"
+                    >
+                      <span class="material-symbols-outlined">close</span>
+                      {{ isActionLoading('reject', ticket.ticketId) ? 'Rejecting...' : 'Reject' }}
+                    </button>
+                    <button
+                      class="primary-action-btn"
+                      type="button"
+                      [disabled]="isActionLoading('approve', ticket.ticketId)"
+                      (click)="approveAction(ticket.ticketId)"
+                    >
+                      <span class="material-symbols-outlined">check</span>
+                      {{ isActionLoading('approve', ticket.ticketId) ? 'Approving...' : 'Approve' }}
+                    </button>
+                  </div>
+                }
+
+                @if (canExecuteAction(ticket)) {
+                  <div class="action-buttons">
+                    <button
+                      class="primary-action-btn"
+                      type="button"
+                      [disabled]="isActionLoading('execute', ticket.ticketId)"
+                      (click)="executeAction(ticket.ticketId)"
+                    >
+                      <span class="material-symbols-outlined">play_arrow</span>
+                      {{ isActionLoading('execute', ticket.ticketId) ? 'Executing...' : 'Execute action' }}
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           @if (selectedTriageResult(); as triageResult) {
             <div class="detail-section">
               <h3 class="section-title">

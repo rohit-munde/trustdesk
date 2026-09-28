@@ -11,6 +11,10 @@ import { TicketsComponent } from './tickets.component';
 
 describe('TicketsComponent', () => {
   const ticket: ITicketPayload = {
+    actionApprovalStatus: 'PENDING_APPROVAL',
+    actionExecutedAt: null,
+    actionExecutionReference: null,
+    actionExecutionStatus: 'NOT_STARTED',
     category: TicketCategory.GENERAL,
     channel: TicketChannel.EMAIL,
     createdAt: '2026-06-28T10:15:00+05:30',
@@ -19,6 +23,7 @@ describe('TicketsComponent', () => {
     escalationRequired: false,
     orderId: 'ord_5001',
     priority: TicketPriority.LOW,
+    recommendedAction: 'CREATE_REPLACEMENT_ORDER',
     sentiment: TicketSentiment.NEUTRAL,
     status: TicketStatus.OPEN,
     subject: 'Support request',
@@ -50,6 +55,26 @@ describe('TicketsComponent', () => {
             escalationRequired: true,
             citations: ['billing_policy.md'],
             draftReply: 'We are checking the billing issue.',
+            recommendedAction: 'REVIEW_BILLING_CHARGE',
+          },
+        })
+      ),
+      approveTicketAction: vi.fn().mockReturnValue(
+        of({ success: true, message: '', payload: { ...ticket, actionApprovalStatus: 'APPROVED' } })
+      ),
+      rejectTicketAction: vi.fn().mockReturnValue(
+        of({ success: true, message: '', payload: { ...ticket, actionApprovalStatus: 'REJECTED' } })
+      ),
+      executeTicketAction: vi.fn().mockReturnValue(
+        of({
+          success: true,
+          message: '',
+          payload: {
+            ...ticket,
+            actionApprovalStatus: 'APPROVED',
+            actionExecutionStatus: 'EXECUTED',
+            actionExecutionReference: 'replacement_order:tkt_9001',
+            actionExecutedAt: '2026-06-28T11:15:00+05:30',
           },
         })
       ),
@@ -97,6 +122,37 @@ describe('TicketsComponent', () => {
       priority: TicketPriority.HIGH,
       sentiment: TicketSentiment.FRUSTRATED,
       escalationRequired: true,
+      recommendedAction: 'REVIEW_BILLING_CHARGE',
+    }));
+  });
+
+  it('approves a recommended action from the API response', () => {
+    component.tickets.set([ticket]);
+
+    component.approveAction('tkt_9001');
+
+    expect(ticketService.approveTicketAction).toHaveBeenCalledWith('tkt_9001');
+    expect(component.tickets()[0].actionApprovalStatus).toBe('APPROVED');
+  });
+
+  it('rejects a recommended action from the API response', () => {
+    component.tickets.set([ticket]);
+
+    component.rejectAction('tkt_9001');
+
+    expect(ticketService.rejectTicketAction).toHaveBeenCalledWith('tkt_9001');
+    expect(component.tickets()[0].actionApprovalStatus).toBe('REJECTED');
+  });
+
+  it('executes an approved action from the API response', () => {
+    component.tickets.set([{ ...ticket, actionApprovalStatus: 'APPROVED' }]);
+
+    component.executeAction('tkt_9001');
+
+    expect(ticketService.executeTicketAction).toHaveBeenCalledWith('tkt_9001');
+    expect(component.tickets()[0]).toEqual(expect.objectContaining({
+      actionExecutionStatus: 'EXECUTED',
+      actionExecutionReference: 'replacement_order:tkt_9001',
     }));
   });
 });

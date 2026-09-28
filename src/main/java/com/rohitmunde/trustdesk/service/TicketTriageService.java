@@ -5,11 +5,14 @@ import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageContext;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;
+import com.rohitmunde.trustdesk.enums.ActionApprovalStatus;
+import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -21,6 +24,7 @@ public class TicketTriageService {
     private final TicketRepository ticketRepository;
     private final KnowledgeBaseService knowledgeBaseService;
     private final AiClient aiClient;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public TriageResult triageTicket(String ticketId) {
@@ -45,6 +49,15 @@ public class TicketTriageService {
         ticket.setTicketSentiment(result.getSentiment());
         ticket.setEscalationRequired(result.getEscalationRequired());
         ticket.setTriagedAt(OffsetDateTime.now());
+        ticket.setDraftReply(result.getDraftReply());
+        ticket.setRecommendedAction(result.getRecommendedAction());
+        ticket.setCitationsJson(objectMapper.writeValueAsString(result.getCitations()));
+
+        ticket.setActionApprovalStatus(
+                result.getRecommendedAction() == RecommendedAction.NO_ACTION
+                        ? ActionApprovalStatus.NOT_REQUIRED
+                        : ActionApprovalStatus.PENDING_APPROVAL
+        );
 
         ticketRepository.save(ticket);
         return result;

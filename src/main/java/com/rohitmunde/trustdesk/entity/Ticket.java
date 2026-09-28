@@ -61,4 +61,30 @@ public class Ticket {
 
     @Column
     private Boolean escalationRequired;
+
+    @Lob
+    @Column(name = "draft_reply", columnDefinition = "TEXT")
+    private String draftReply;
+
+    @Lob
+    @Column(name = "citations_json", columnDefinition = "TEXT")
+    private String citationsJson;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recommended_action")
+    private RecommendedAction recommendedAction;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action_approval_status")
+    private ActionApprovalStatus actionApprovalStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action_execution_status")
+    private ActionExecutionStatus actionExecutionStatus;
+
+    @Column(name = "action_execution_reference")
+    private String actionExecutionReference;
+
+    @Column(name = "action_executed_at")
+    private OffsetDateTime actionExecutedAt;
 }

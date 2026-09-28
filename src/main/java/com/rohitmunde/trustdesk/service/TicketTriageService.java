@@ -1,6 +1,6 @@
 package com.rohitmunde.trustdesk.service;
 
-import com.rohitmunde.trustdesk.TicketRepository;
+import com.rohitmunde.trustdesk.repository.TicketRepository;
 import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageContext;
 import com.rohitmunde.trustdesk.dto.TriageResult;
@@ -23,6 +23,7 @@ public class TicketTriageService {
 
     private final TicketRepository ticketRepository;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final AiOperationTraceService aiOperationTraceService;
     private final AiClient aiClient;
     private final ObjectMapper objectMapper;
 
@@ -42,7 +43,16 @@ public class TicketTriageService {
                 .policies(documents)
                 .build();
 
-        TriageResult result = aiClient.triage(context);
+        TriageResult result;
+
+        try{
+            result = aiClient.triage(context);
+            aiOperationTraceService.recordSuccess("default", context, result);
+        }
+        catch (Exception ex) {
+            aiOperationTraceService.recordFailure("default", context, ex);
+            throw new RuntimeException("AI triage operation failed", ex);
+        }
 
         ticket.setTicketCategory(result.getCategory());
         ticket.setTicketPriority(result.getPriority());

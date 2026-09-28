@@ -1,6 +1,6 @@
 package com.rohitmunde.trustdesk.service;
 
-import com.rohitmunde.trustdesk.TicketRepository;
+import com.rohitmunde.trustdesk.repository.TicketRepository;
 import com.rohitmunde.trustdesk.ai.AiClient;
 import com.rohitmunde.trustdesk.dto.TriageResult;
 import com.rohitmunde.trustdesk.entity.Ticket;

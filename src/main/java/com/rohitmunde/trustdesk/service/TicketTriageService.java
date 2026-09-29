@@ -10,6 +10,7 @@ import com.rohitmunde.trustdesk.enums.RecommendedAction;
 import com.rohitmunde.trustdesk.exception.TicketNotFoundException;
 import com.rohitmunde.trustdesk.model.KnowledgeDocument;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -26,6 +27,9 @@ public class TicketTriageService {
     private final AiOperationTraceService aiOperationTraceService;
     private final AiClient aiClient;
     private final ObjectMapper objectMapper;
+
+    @Value("${trustdesk.ai.provider:mock}")
+    private String aiProvider;
 
     @Transactional
     public TriageResult triageTicket(String ticketId) {
@@ -45,13 +49,12 @@ public class TicketTriageService {
 
         TriageResult result;
 
-        try{
+        try {
             result = aiClient.triage(context);
-            aiOperationTraceService.recordSuccess("default", context, result);
-        }
-        catch (Exception ex) {
-            aiOperationTraceService.recordFailure("default", context, ex);
-            throw new RuntimeException("AI triage operation failed", ex);
+            aiOperationTraceService.recordSuccess(aiProvider, context, result);
+        } catch (Exception ex) {
+            aiOperationTraceService.recordFailure(aiProvider, context, ex);
+            throw ex;
         }
 
         ticket.setTicketCategory(result.getCategory());

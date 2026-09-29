@@ -45,6 +45,20 @@ public class MockAiClientTest {
         Assertions.assertThat(result.getRecommendedAction()).isEqualTo(RecommendedAction.NO_ACTION);
     }
 
+    @Test
+    void triagesTrackingTicketAsShipping() {
+        var result = mockAiClient.triage(TriageContext.builder()
+                .subject("Where is my order?")
+                .body("The tracking link has not updated for two days. Can you check the order status?")
+                .policies(java.util.List.of(policy("shipping_policy.md")))
+                .build());
+
+        Assertions.assertThat(result.getCategory()).isEqualTo(TicketCategory.SHIPPING);
+        Assertions.assertThat(result.getPriority()).isEqualTo(TicketPriority.LOW);
+        Assertions.assertThat(result.getSentiment()).isEqualTo(TicketSentiment.NEUTRAL);
+        Assertions.assertThat(result.getRecommendedAction()).isEqualTo(RecommendedAction.CHECK_SHIPPING_STATUS);
+    }
+
     private KnowledgeDocument policy(String sourceFile) {
         return new KnowledgeDocument("policy", "Policy", "Policy content", sourceFile);
     }

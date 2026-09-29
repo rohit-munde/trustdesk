@@ -18,7 +18,7 @@ public class MockAiClient implements AiClient {
 
     @Override
     public TriageResult triage(TriageContext context) {
-        String text = context.getSubject() + " " + context.getBody();
+        String text = (context.getSubject() + " " + context.getBody()).toLowerCase();
         List<String> citations = context.getPolicies()
                 .stream()
                 .map(KnowledgeDocument::getSourceFile)
@@ -33,6 +33,18 @@ public class MockAiClient implements AiClient {
                     .citations(citations)
                     .draftReply(buildDraftReply(TicketCategory.REFUND))
                     .recommendedAction(recommendAction(TicketCategory.REFUND))
+                    .build();
+        }
+
+        if (text.contains("tracking") || text.contains("where is my order") || text.contains("order status") || text.contains("shipment")) {
+            return TriageResult.builder()
+                    .category(TicketCategory.SHIPPING)
+                    .priority(TicketPriority.LOW)
+                    .sentiment(TicketSentiment.NEUTRAL)
+                    .escalationRequired(false)
+                    .citations(citations)
+                    .draftReply(buildDraftReply(TicketCategory.SHIPPING))
+                    .recommendedAction(recommendAction(TicketCategory.SHIPPING))
                     .build();
         }
 

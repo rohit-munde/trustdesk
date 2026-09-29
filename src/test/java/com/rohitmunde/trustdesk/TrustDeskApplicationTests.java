@@ -1,5 +1,6 @@
 package com.rohitmunde.trustdesk;
 
+import com.rohitmunde.trustdesk.repository.AiOperationTraceRepository;
 import com.rohitmunde.trustdesk.repository.TicketRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,9 @@ class TrustDeskApplicationTests {
 
 	@MockitoBean
 	private TicketRepository ticketRepository;
+
+	@MockitoBean
+	private AiOperationTraceRepository aiOperationTraceRepository;
 
 	@Test
 	void contextLoads() {

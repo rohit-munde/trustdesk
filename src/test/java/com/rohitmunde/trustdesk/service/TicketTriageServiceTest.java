@@ -17,12 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,9 @@ public class TicketTriageServiceTest {
 
     @Mock
     private AiClient aiClient;
+
+    @Mock
+    private AiOperationTraceService aiOperationTraceService;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -74,6 +80,7 @@ public class TicketTriageServiceTest {
         when(aiClient.triage(any())).thenReturn(triageResult);
         when(objectMapper.writeValueAsString(triageResult.getCitations()))
                 .thenReturn("[\"replacement-policy.md\"]");
+        ReflectionTestUtils.setField(ticketTriageService, "aiProvider", "mock");
 
         TriageResult triagedResult = ticketTriageService.triageTicket(ticket.getId());
 
@@ -87,6 +94,7 @@ public class TicketTriageServiceTest {
         Assertions.assertThat(ticket.getRecommendedAction()).isEqualTo(RecommendedAction.CREATE_REPLACEMENT_ORDER);
         Assertions.assertThat(ticket.getCitationsJson()).isEqualTo("[\"replacement-policy.md\"]");
         Assertions.assertThat(ticket.getActionApprovalStatus()).isEqualTo(ActionApprovalStatus.PENDING_APPROVAL);
+        verify(aiOperationTraceService).recordSuccess(eq("mock"), any(), eq(triageResult));
     }
 
     @Test
